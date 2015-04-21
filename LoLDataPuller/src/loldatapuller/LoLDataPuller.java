@@ -4,6 +4,7 @@
  *  for use in a companion application.
  */
 package loldatapuller;
+import constant.Region;
 import dto.FeaturedGames.FeaturedGames;
 import java.util.Map;
 import dto.League.League;
@@ -18,30 +19,20 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import main.java.riotapi.RiotApi;
 import main.java.riotapi.RiotApiException;
 
-
-class Player implements Serializable{
-    public int wins, losses;
-    public String name, league;
-    Player(String name, String league, int wins, int losses) {
-        this.name = name;
-        this.league = league;
-        this.wins = wins;
-        this.losses = losses;
-    }
-}
-
 public class LoLDataPuller {
 
-    public static Map<String, ArrayList<Player>> leagueData;
+    public static Map<String, Set<League>> leagueData;
     public static RiotApi api = new RiotApi("6c284814-e017-4df1-bee2-f373ff252136");
     
-    public static void addData() throws RiotApiException {
+    private static String getIdsFromFeaturedGames() throws RiotApiException{
         FeaturedGames featuredGames = api.getFeaturedGames();
         List<dto.FeaturedGames.CurrentGameInfo> games = featuredGames.getGameList();
         Iterator<dto.FeaturedGames.CurrentGameInfo> gamesIt = games.iterator();
@@ -55,30 +46,35 @@ public class LoLDataPuller {
             long ID = summoner.getId();
             idList += ID + ",";
         }
-
-        Map<String, List<League>> data = api.getLeagueBySummoners(idList);
-        for (Entry<String, List<League>> entry : data.entrySet()) {
         
+        return idList;
+    }
+    
+    public static void addData() throws RiotApiException {
+        //String idList = getIdsFromFeaturedGames();
+        String idList = "";
+        
+        String names[] = {"Omely", "Motroco", "Voryn", "LP Tanou", "Ywalsh"}; 
+        
+        for (String name : names) {
+           long id = api.getSummonerByName(Region.EUW, name).values().iterator().next().getId();
+           idList += id + ",";
+        }
+
+        Map<String, List<League>> data = api.getLeagueBySummoners(Region.EUW, idList);
+        for (Entry<String, List<League>> entry : data.entrySet()) {
+            
             Iterator<League> leagueIt = entry.getValue().iterator();
             while(leagueIt.hasNext()) {
                 League league = leagueIt.next();
                 if (!league.getQueue().equals("RANKED_SOLO_5x5")) continue;
-
-                String leagueName = league.getName();
-                if (leagueData.containsKey(leagueName)) return;
-
-                ArrayList<Player> playersInLeague = new ArrayList<>();
-                Iterator<LeagueEntry> leagueEntryIt = league.getEntries().iterator();
-                while(leagueEntryIt.hasNext()) {
-                    LeagueEntry leagueEntry = leagueEntryIt.next();
-                    String playerId = leagueEntry.getPlayerOrTeamId();
-                    String name = leagueEntry.getPlayerOrTeamName();
-                    int wins = leagueEntry.getWins();
-                    int losses = leagueEntry.getLosses();
-
-                    playersInLeague.add(new Player(name, leagueName, wins, losses));
+                String tier = league.getTier();
+                if (leagueData.containsKey(tier)) leagueData.get(tier).add(league);
+                else {
+                    Set<League> leagues = new HashSet<>();
+                    leagues.add(league);
+                    leagueData.put(tier, leagues);
                 }
-                leagueData.put(leagueName, playersInLeague);
             }
         }
     }
@@ -87,7 +83,7 @@ public class LoLDataPuller {
       try {
          FileInputStream fileIn = new FileInputStream("leagueData.ser");
          ObjectInputStream in = new ObjectInputStream(fileIn);
-         leagueData = (HashMap<String, ArrayList<Player>>)in.readObject();
+         leagueData = (HashMap<String, Set<League>>)in.readObject();
          in.close();
          fileIn.close();
          System.out.println("Serialized data loaded from leagueData.ser");
@@ -117,6 +113,8 @@ public class LoLDataPuller {
         try {
             deserializeData();
             addData();
+            
+            int x = leagueData.size();
             serializeData();
         }
         catch (Exception e) {
