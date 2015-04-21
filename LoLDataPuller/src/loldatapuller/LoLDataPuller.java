@@ -9,12 +9,14 @@ import dto.FeaturedGames.FeaturedGames;
 import java.util.Map;
 import dto.League.League;
 import dto.FeaturedGames.Participant;
+import dto.League.LeagueEntry;
 import dto.Summoner.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,7 +68,14 @@ public class LoLDataPuller {
                 League league = leagueIt.next();
                 if (!league.getQueue().equals("RANKED_SOLO_5x5")) continue;
                 String tier = league.getTier();
-                if (leagueData.containsKey(tier)) leagueData.get(tier).add(league);
+                if (leagueData.containsKey(tier)) {
+                    boolean contains = false;
+                    for (League l : leagueData.get(tier)) {
+                        String firstName = l.getEntries().iterator().next().getPlayerOrTeamName();
+                        if (firstName.equals(league.getEntries().iterator().next().getPlayerOrTeamName())) contains = true;
+                    }     
+                    if (!contains) leagueData.get(tier).add(league); 
+                }
                 else {
                     Set<League> leagues = new HashSet<>();
                     leagues.add(league);
@@ -109,9 +118,21 @@ public class LoLDataPuller {
     public static void main(String[] args) {        
         try {
             deserializeData();
-            addData();
+            //addData();
             
-            int x = leagueData.size();
+            HashSet<String> names = new HashSet<>();
+           
+            //Remove duplicates
+            for (String tier : leagueData.keySet()) {
+                 List<League> found = new ArrayList<>();
+                 for (League league : leagueData.get(tier)) {
+                    String name = league.getEntries().iterator().next().getPlayerOrTeamName();
+                    if (names.contains(name)) found.add(league);
+                    else names.add(name);
+                }
+                leagueData.get(tier).removeAll(found);
+            } 
+
             serializeData();
         }
         catch (Exception e) {

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JPanel;
 import dto.League.League;
+import dto.League.LeagueEntry;
 import java.awt.Graphics;
 
 /**
@@ -23,6 +24,13 @@ public class LoLPanel extends JPanel {
     
     public LoLPanel() {
         deserializeData();
+        
+        for (String tier : leagueData.keySet()) {
+            System.out.println(tier);
+            for (League league : leagueData.get(tier)) {
+                System.out.println("\t" + league.getName() + "(" + league.getEntries().size() + ")");
+            }
+        }
     }
 
     public void deserializeData() {
@@ -42,6 +50,7 @@ public class LoLPanel extends JPanel {
     
     public void paint(Graphics g) {
         super.paint(g);
+        
         g.drawString(leagueData.toString(),15,15);
     }
 }
