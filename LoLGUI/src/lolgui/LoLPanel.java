@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import dto.League.League;
 import dto.League.LeagueEntry;
 import java.awt.Graphics;
+import java.util.Map.Entry;
 
 /**
  *
@@ -21,6 +22,7 @@ import java.awt.Graphics;
  */
 public class LoLPanel extends JPanel {
     Map<String, Set<League>> leagueData;
+    Map<String, String> championData;
     
     public LoLPanel() {
         deserializeData();
@@ -28,9 +30,12 @@ public class LoLPanel extends JPanel {
         for (String tier : leagueData.keySet()) {
             System.out.println(tier);
             for (League league : leagueData.get(tier)) {
-                System.out.println("\t" + league.getName() + "(" + league.getEntries().size() + ")");
+                System.out.println("\t" + league.getName());
+                for (LeagueEntry entry : league.getEntries()) {
+                    System.out.println("\t\t" + entry.getPlayerOrTeamName() + " plays " + championData.get(entry.getPlayerOrTeamId()));
+                }
             }
-        }
+        } 
     }
 
     public void deserializeData() {
@@ -41,6 +46,13 @@ public class LoLPanel extends JPanel {
          in.close();
          fileIn.close();
          System.out.println("Serialized data loaded from leagueData.ser");
+         
+         fileIn = new FileInputStream("championData.ser");
+         in = new ObjectInputStream(fileIn);
+         championData = (HashMap<String, String>)in.readObject();
+         in.close();
+         fileIn.close();
+         System.out.println("Serialized data loaded from championData.ser");
       }
       catch(Exception e) {
           leagueData = new HashMap<>();

@@ -5,11 +5,16 @@
  */
 package loldatapuller;
 import constant.Region;
+import dto.Champion.Champion;
 import dto.FeaturedGames.FeaturedGames;
 import java.util.Map;
 import dto.League.League;
 import dto.FeaturedGames.Participant;
 import dto.League.LeagueEntry;
+import dto.Stats.ChampionStats;
+import dto.Stats.PlayerStatsSummary;
+import dto.Stats.PlayerStatsSummaryList;
+import dto.Stats.RankedStats;
 import dto.Summoner.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,9 +31,11 @@ import java.util.Set;
 import main.java.riotapi.RiotApi;
 import main.java.riotapi.RiotApiException;
 
+
 public class LoLDataPuller {
 
     public static Map<String, Set<League>> leagueData;
+    public static Map<String, String> championData;
     public static RiotApi api = new RiotApi("6c284814-e017-4df1-bee2-f373ff252136");
     
     private static String getIdsFromFeaturedGames() throws RiotApiException{
@@ -93,9 +100,17 @@ public class LoLDataPuller {
          in.close();
          fileIn.close();
          System.out.println("Serialized data loaded from leagueData.ser");
+         
+         fileIn = new FileInputStream("championData.ser");
+         in = new ObjectInputStream(fileIn);
+         championData = (HashMap<String, String>)in.readObject();
+         in.close();
+         fileIn.close();
+         System.out.println("Serialized data loaded from championData.ser");
       }
       catch(Exception e) {
           leagueData = new HashMap<>();
+          championData = new HashMap<>();
           System.err.println(e.getMessage());
       }
     }
@@ -108,7 +123,15 @@ public class LoLDataPuller {
          out.flush();
          out.close();
          fileOut.close();
-         System.out.println("Serialized data saved to leagueData.ser with " + leagueData.size() + " entries.");
+         System.out.println("Serialized league data saved to leagueData.ser with " + leagueData.size() + " entries.");
+         
+         fileOut = new FileOutputStream("championData.ser");
+         out = new ObjectOutputStream(fileOut);
+         out.writeObject(championData);
+         out.flush();
+         out.close();
+         fileOut.close();
+         System.out.println("Serialized champion data saved to leagueData.ser with " + championData.size() + " entries.");
       }
       catch(IOException i) {
           System.err.println(i.getMessage());
@@ -120,9 +143,8 @@ public class LoLDataPuller {
             deserializeData();
             //addData();
             
-            HashSet<String> names = new HashSet<>();
-           
             //Remove duplicates
+       /*     HashSet<String> names = new HashSet<>();
             for (String tier : leagueData.keySet()) {
                  List<League> found = new ArrayList<>();
                  for (League league : leagueData.get(tier)) {
@@ -131,13 +153,46 @@ public class LoLDataPuller {
                     else names.add(name);
                 }
                 leagueData.get(tier).removeAll(found);
-            } 
-
+            } */
+            
+            
+            for (String tier : leagueData.keySet()) {
+                 for (League league : leagueData.get(tier)) {
+                    for (LeagueEntry entry : league.getEntries()) {
+                        String id = entry.getPlayerOrTeamId();
+                        if (!championData.containsKey(id) || championData.get(id).equals("")) {
+                            championData.put(id, getMostPlayedChampion(id));
+                        }
+                    }
+                }
+            }
             serializeData();
         }
         catch (Exception e) {
             System.err.println(e.getMessage());
         } 
+    }
+    
+    private static String getMostPlayedChampion(String id) throws RiotApiException {
+
+        for (Region r : Region.values()) {
+            try { 
+                RankedStats stats = api.getRankedStats(r, Integer.parseInt(id));
+                int max = 0; int maxId = -1;
+                for (ChampionStats champ : stats.getChampions()){
+                    if (champ.getId() == 0) continue;
+                    int sessions = champ.getStats().getTotalSessionsPlayed();
+                    if (sessions > max) {
+                        max = sessions;
+                        maxId = champ.getId();
+                    }
+                }
+                return api.getDataChampion(maxId).getName();
+            }
+            catch(RiotApiException e) { }
+        }
+        System.out.println(id);
+        return "";
     }
 }
 
