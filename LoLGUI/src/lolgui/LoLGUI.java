@@ -5,7 +5,13 @@
  */
 package lolgui;
 
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
@@ -14,11 +20,11 @@ import javax.swing.WindowConstants;
  * @author PROSSERCJ1
  */
 
-public class LoLGUI extends JFrame {
+public class LoLGUI extends JFrame{
     Point DEFAULTBASE = new Point(50,50);
     final int DEFAULTWIDTH = 500, DEFAULTHEIGHT = 500, MAXVERTICES = 50, MINVERTICES = 3;
 
-    LoLPanel panel = new LoLPanel();
+    LoLPanel panel;
     
     public LoLGUI() {
         initComponents();
@@ -26,8 +32,22 @@ public class LoLGUI extends JFrame {
     private void initComponents() {
         setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE);        
         setBounds(DEFAULTBASE.x,DEFAULTBASE.y, DEFAULTWIDTH, DEFAULTHEIGHT);
+        panel = new LoLPanel();
         getContentPane().add(panel);
+        
+        
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                // do stuff   
+                panel.setSize(getWidth(), getHeight());
+            }
+        });
+        
+       
+        
     }
+    
+    
     
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -36,4 +56,6 @@ public class LoLGUI extends JFrame {
             }
         });
     } 
+
+    
 }

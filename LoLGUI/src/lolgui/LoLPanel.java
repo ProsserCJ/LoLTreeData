@@ -14,6 +14,11 @@ import javax.swing.JPanel;
 import dto.League.League;
 import dto.League.LeagueEntry;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -24,18 +29,62 @@ public class LoLPanel extends JPanel {
     Map<String, Set<League>> leagueData;
     Map<String, String> championData;
     
+    Positioner positioner;
+    
     public LoLPanel() {
+        super();
+        setLayout(null);
+        
+        positioner = new Positioner(400,400);
+        
         deserializeData();
         
-        for (String tier : leagueData.keySet()) {
-            System.out.println(tier);
-            for (League league : leagueData.get(tier)) {
-                System.out.println("\t" + league.getName());
-                for (LeagueEntry entry : league.getEntries()) {
-                    System.out.println("\t\t" + entry.getPlayerOrTeamName() + " plays " + championData.get(entry.getPlayerOrTeamId()));
-                }
+//        for (String tier : leagueData.keySet()) {
+//            System.out.println(tier);
+//            for (League league : leagueData.get(tier)) {
+//                System.out.println("\t" + league.getName());
+//                for (LeagueEntry entry : league.getEntries()) {
+//                    System.out.println("\t\t" + entry.getPlayerOrTeamName() + " plays " + championData.get(entry.getPlayerOrTeamId()));
+//                }
+//            }
+//        } 
+        
+         addMouseListener(new MouseAdapter(){
+            public void mouseClicked(MouseEvent e)
+            {
+                checkClick(e.getPoint());
+                repaint();
             }
-        } 
+        });
+        
+        
+        //seting test data
+        ArrayList<League> searchResults = new ArrayList();
+        for(League l : leagueData.get("MASTER"))
+        {
+            searchResults.add(l);
+        }
+        
+        positioner.addQueryResults("MASTER LEAGUE", searchResults);
+        
+        //seting test data
+        searchResults = new ArrayList();
+        for(League l : leagueData.get("GOLD"))
+        {
+            searchResults.add(l);
+        }
+        positioner.addQueryResults("GOLD LEAGUE", searchResults);
+        
+        
+        //seting test data
+        searchResults = new ArrayList();
+        searchResults.add(leagueData.get("GOLD").iterator().next());
+        searchResults.add(leagueData.get("MASTER").iterator().next());
+        positioner.addQueryResults("FIRST OF EACH", searchResults);
+        
+        
+        positioner.positionQueryResults();
+        
     }
 
     public void deserializeData() {
@@ -62,7 +111,24 @@ public class LoLPanel extends JPanel {
     
     public void paint(Graphics g) {
         super.paint(g);
+        positioner.paintAll(g);
         
-        g.drawString(leagueData.toString(),15,15);
     }
+    
+    public void loadTier(){
+        
+    }
+    
+    @Override
+    public void setSize(int width, int height)
+    {
+        positioner.setSize(width,height);
+        positioner.positionQueryResults();
+    }
+    
+    public void checkClick(Point p){
+        positioner.checkClick(p);
+        
+    }
+
 }
