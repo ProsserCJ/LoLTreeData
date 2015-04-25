@@ -5,15 +5,12 @@
  */
 package loldatapuller;
 import constant.Region;
-import dto.Champion.Champion;
 import dto.FeaturedGames.FeaturedGames;
 import java.util.Map;
 import dto.League.League;
 import dto.FeaturedGames.Participant;
 import dto.League.LeagueEntry;
 import dto.Stats.ChampionStats;
-import dto.Stats.PlayerStatsSummary;
-import dto.Stats.PlayerStatsSummaryList;
 import dto.Stats.RankedStats;
 import dto.Summoner.*;
 import java.io.FileInputStream;
@@ -21,7 +18,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;

@@ -12,22 +12,28 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JPanel;
 import dto.League.League;
-import dto.League.LeagueEntry;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author PROSSERCJ1
  */
+
 public class LoLPanel extends JPanel {
     Map<String, Set<League>> leagueData;
     Map<String, String> championData;
+    List<Team> teamData;
     
     Positioner positioner;
     
@@ -36,7 +42,6 @@ public class LoLPanel extends JPanel {
         setLayout(null);
         
         positioner = new Positioner(400,400);
-        
         deserializeData();
         
 //        for (String tier : leagueData.keySet()) {
@@ -88,31 +93,63 @@ public class LoLPanel extends JPanel {
     }
 
     public void deserializeData() {
+      FileInputStream fileIn;
+      ObjectInputStream in;
+              
       try {
-         FileInputStream fileIn = new FileInputStream("leagueData.ser");
-         ObjectInputStream in = new ObjectInputStream(fileIn);
+         fileIn = new FileInputStream("leagueData.ser");
+         in = new ObjectInputStream(fileIn);
          leagueData = (HashMap<String, Set<League>>)in.readObject();
          in.close();
          fileIn.close();
          System.out.println("Serialized data loaded from leagueData.ser");
-         
+      }
+      catch(Exception e) {
+          leagueData = new HashMap<>();
+          System.err.println("Failed to load leagueData.ser");
+      }
+      try{ 
          fileIn = new FileInputStream("championData.ser");
          in = new ObjectInputStream(fileIn);
          championData = (HashMap<String, String>)in.readObject();
          in.close();
          fileIn.close();
          System.out.println("Serialized data loaded from championData.ser");
+      } catch(Exception e) {
+         championData = new HashMap<>();
+         System.err.println("Failed to load championData.ser");
       }
-      catch(Exception e) {
-          leagueData = new HashMap<>();
-          System.err.println(e.getMessage());
+      
+      try{   
+         fileIn = new FileInputStream("teamData.ser");
+         in = new ObjectInputStream(fileIn);
+         teamData = (List<Team>)in.readObject();
+         in.close();
+         fileIn.close();
+         System.out.println("Serialized data loaded from teamData.ser");
+      } catch(Exception e) {
+         teamData = new ArrayList<>();
+         System.err.println("Failed to load teamData.ser");
       }
+    }
+    
+    public void serializeData() {
+           try {
+            FileOutputStream fileOut = new FileOutputStream("teamData.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(teamData);
+            out.flush();
+            out.close();
+            fileOut.close();
+            System.out.println("Serialized team data to teamData.ser with " + teamData.size() + " entries.");
+         } catch(Exception e) {
+             System.err.println(e.getMessage());
+         }
     }
     
     public void paint(Graphics g) {
         super.paint(g);
-        positioner.paintAll(g);
-        
+        positioner.paintAll(g); 
     }
     
     public void loadTier(){
@@ -130,5 +167,4 @@ public class LoLPanel extends JPanel {
         positioner.checkClick(p);
         
     }
-
 }
