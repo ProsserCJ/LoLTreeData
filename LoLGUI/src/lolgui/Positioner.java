@@ -46,6 +46,8 @@ public class Positioner {
     
     public void setResults(ArrayList<LeagueObject> l){leagueObjects=l;}
     
+    private PanelObject clickedItem = null;
+    
     public void paintAll(Graphics g)
     {
         for(QueryObject q : queries)
@@ -156,14 +158,29 @@ public class Positioner {
     
     void checkClick(Point p)
     {
+        this.clickedItem = null;
         for(QueryObject q :queries)
         {
             q.refresh();
         }
         for(QueryObject q :queries)
         {
-            
-            q.checkClick(p);
+            if(q.checkClick(p)){
+                q.select();
+                this.clickedItem=q;
+            }
         }
+        for(LeagueObject l : leagueObjects)
+        {
+            if(l.checkClick(p)){                
+                l.select();
+                this.clickedItem=l;
+            }
+        }
+    }
+    
+    public void moveSelected(int x, int y){
+        if(clickedItem!=null)
+            this.clickedItem.setCenter(x,y);
     }
 }

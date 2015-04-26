@@ -6,6 +6,7 @@
 package lolgui;
 
 import dto.League.League;
+import java.awt.Color;
 
 /**
  *
@@ -15,10 +16,13 @@ public class LeagueObject extends PanelObject{
     
     public League leagueData;
     
+    
+    
     LeagueObject(League data)
     {
         super(data.getName());
         leagueData = data;
+        super.fillColor = new Color(255,255,150);
     }
     
 }

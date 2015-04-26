@@ -16,6 +16,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileOutputStream;
@@ -30,7 +31,7 @@ import javax.swing.SwingUtilities;
  * @author PROSSERCJ1
  */
 
-public class LoLPanel extends JPanel {
+public class LoLPanel extends JPanel implements MouseMotionListener{
     Map<String, Set<League>> leagueData;
     Map<String, String> championData;
     List<Team> teamData;
@@ -55,13 +56,13 @@ public class LoLPanel extends JPanel {
 //        } 
         
          addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e)
+            public void mousePressed(MouseEvent e)
             {
                 checkClick(e.getPoint());
                 repaint();
             }
         });
-        
+        addMouseMotionListener(this);
         
         //seting test data
         ArrayList<League> searchResults = new ArrayList();
@@ -165,6 +166,14 @@ public class LoLPanel extends JPanel {
     
     public void checkClick(Point p){
         positioner.checkClick(p);
-        
+    }
+    
+     public void mouseMoved(MouseEvent e) {
+         //don't care
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        positioner.moveSelected(e.getX(),e.getY());
+        repaint();
     }
 }

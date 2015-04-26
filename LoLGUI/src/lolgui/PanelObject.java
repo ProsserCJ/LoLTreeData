@@ -92,10 +92,9 @@ public class PanelObject {
         return new Rectangle(0,0,bounds.width,bounds.height-2);
     }
     
-    public void checkClick(Point p)
+    public boolean checkClick(Point p)
     {
-        if(bounds.contains(p))
-            select();
+        return bounds.contains(p);
     }
     
     public void addLink(PanelObject o)    {
