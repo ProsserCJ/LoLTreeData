@@ -5,6 +5,8 @@
  */
 package lolgui;
 
+import java.awt.Color;
+
 /**
  *
  * @author Nalta
@@ -12,5 +14,6 @@ package lolgui;
 public class QueryObject extends PanelObject {
     QueryObject(String s){
         super(s);
+        super.fillColor = new Color(255,150,255);
     }
 }

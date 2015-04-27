@@ -130,7 +130,7 @@ public class LoLGUI extends JFrame implements ActionListener{
                 {
                   @Override
                   public void windowClosed(WindowEvent e) {
-                    if (!newTeam.getName().equals("")) panel.teamData.add(newTeam);
+                    if (!newTeam.getName().equals("")) panel.addTeam(newTeam);
                   }
                 });      
                 dialog.show();

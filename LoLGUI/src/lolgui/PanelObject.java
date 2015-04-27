@@ -18,14 +18,37 @@ import java.util.List;
  *
  * @author Nalta
  */
-public class PanelObject {
+public abstract class PanelObject {
    
     private final int MAX_STR_LENGTH = 15;
     
     private ArrayList<PanelObject> links = new ArrayList();
     
+    public ArrayList<PanelObject> getLinks(){return links;}
+    
     private String info;
     
+    public boolean visible = true;
+    
+    private boolean childrenVisible = true;
+    
+    public void toggleChildrenVisibility(){
+        childrenVisible = !childrenVisible;
+        for(PanelObject p : links)
+        {
+            p.setSelfAndChildVisibility(childrenVisible);
+            
+        }
+    }
+    
+    private void setSelfAndChildVisibility(boolean b){
+        visible=childrenVisible= b;
+        for(PanelObject p : links)
+        {
+            p.setSelfAndChildVisibility(b);
+        }
+    }
+        
     protected Color boxOutlineColor = new Color(0,0,0);
     protected Color fillColor = new Color(255,255,255);    
     protected Color lineColor = new Color(0,0,0);   
@@ -41,7 +64,7 @@ public class PanelObject {
     
     private boolean selected = false;
     
-    PanelObject(String s)
+    public PanelObject(String s)
     {
         setString(s);
         int defaultFontSize = 20;
@@ -54,7 +77,16 @@ public class PanelObject {
         center.y = y;
     }
     
+    public void setCenter(Point p){
+        center = p;
+    }
+    
+    public Point getCenter(){
+        return center;
+    }
+    
     public void paint(Graphics g){
+        if(!this.visible)return;
          if(selected)
             g.setColor(selectedColor);
         else
@@ -62,7 +94,8 @@ public class PanelObject {
         //draw lines before text
         for(PanelObject p : links)
         {
-            g.drawLine(center.x, center.y, p.center.x, p.center.y);
+            if(p.visible)
+                g.drawLine(center.x, center.y, p.center.x, p.center.y);
         }
         
         //get string width and height
@@ -92,15 +125,20 @@ public class PanelObject {
         return new Rectangle(0,0,bounds.width,bounds.height-2);
     }
     
-    public void checkClick(Point p)
+    public boolean checkClick(Point p)
     {
-        if(bounds.contains(p))
-            select();
+        if(!visible)return false;
+        return bounds.contains(p);
     }
     
-    public void addLink(PanelObject o)    {
-        o.linksToMe++;
-        links.add(o);
+    public void addRemoveLink(PanelObject o){
+        if(links.contains(o)){
+            links.remove(0);
+        }
+        else{
+            o.linksToMe++;
+            links.add(o);
+        }
     }
     
     public final void setString(String s)
@@ -125,6 +163,16 @@ public class PanelObject {
         selected = false;
         for(PanelObject p : links){
             p.refresh();
+        }
+    }
+    
+    public final void move(int dx, int dy)
+    {
+        center.x += dx;
+        center.y += dy;
+        
+        for(PanelObject p : links){
+            p.move(dx, dy);
         }
     }
     

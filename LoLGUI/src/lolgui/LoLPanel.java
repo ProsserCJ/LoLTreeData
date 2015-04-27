@@ -17,6 +17,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileOutputStream;
@@ -32,18 +33,22 @@ import javax.swing.SwingUtilities;
  * @author PROSSERCJ1
  */
 
-public class LoLPanel extends JPanel {
+public class LoLPanel extends JPanel implements MouseMotionListener{
     Map<String, Set<League>> leagueData;
     Map<String, String> championData;
-    List<Team> teamData;
+    private List<Team> teamData;
+    
+    Point lastMouseClick;
     
     Positioner positioner;
+    
+    int numClickes = 0;
     
     public LoLPanel() {
         super();
         setLayout(null);
         
-        positioner = new Positioner(400,400);
+        positioner = new Positioner(getWidth(),getHeight());
         deserializeData();
         
 //        for (String tier : leagueData.keySet()) {
@@ -57,13 +62,23 @@ public class LoLPanel extends JPanel {
 //        } 
         
          addMouseListener(new MouseAdapter(){
-            public void mouseClicked(MouseEvent e)
+            @Override
+            public void mousePressed(MouseEvent e)
             {
-                checkClick(e.getPoint());
+                lastMouseClick = e.getPoint();
+                positioner.checkClick(lastMouseClick,e.isShiftDown());
                 repaint();
             }
+            @Override
+            public void mouseClicked(MouseEvent e){
+                if(e.getClickCount()>=2){
+                    positioner.handleDoubleClick(e.getPoint());
+                    repaint();
+                }
+                
+            }
         });
-        
+        addMouseMotionListener(this);
         
         //seting test data
         ArrayList<League> searchResults = new ArrayList();
@@ -182,8 +197,11 @@ public class LoLPanel extends JPanel {
         positioner.paintAll(g); 
     }
     
-    public void loadTier(){
-        
+    public void addTeam(Team t)
+    {
+        teamData.add(t);
+        positioner.addTeam(t);
+        this.repaint();
     }
     
     @Override
@@ -193,8 +211,13 @@ public class LoLPanel extends JPanel {
         positioner.positionQueryResults();
     }
     
-    public void checkClick(Point p){
-        positioner.checkClick(p);
-        
+     public void mouseMoved(MouseEvent e) {
+         //don't care
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        positioner.moveSelected(e.getX()-lastMouseClick.x,e.getY()-lastMouseClick.y);
+        repaint();
+        lastMouseClick = e.getPoint();
     }
 }
