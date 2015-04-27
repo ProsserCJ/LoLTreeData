@@ -44,11 +44,11 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
     
     int numClickes = 0;
     
-    public LoLPanel() {
+    public LoLPanel(int w, int h) {
         super();
         setLayout(null);
         
-        positioner = new Positioner(getWidth(),getHeight());
+        positioner = new Positioner(w,h);
         deserializeData();
         
 //        for (String tier : leagueData.keySet()) {
@@ -80,33 +80,28 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
         });
         addMouseMotionListener(this);
         
-        //seting test data
-        ArrayList<League> searchResults = new ArrayList();
-        for(League l : leagueData.get("MASTER"))
+        
+        for(String tier : leagueData.keySet())
         {
-            searchResults.add(l);
+        
+            //seting test data
+            ArrayList<League> searchResults = new ArrayList();
+            for(League l : leagueData.get(tier))
+            {
+                searchResults.add(l);
+            }
+
+            positioner.addQueryResults(tier, searchResults);
         }
         
-        positioner.addQueryResults("MASTER LEAGUE", searchResults);
-        
-        //seting test data
-        searchResults = new ArrayList();
-        for(League l : leagueData.get("GOLD"))
-        {
-            searchResults.add(l);
-        }
-        positioner.addQueryResults("GOLD LEAGUE", searchResults);
         
         
-        //seting test data
-        searchResults = new ArrayList();
-        searchResults.add(leagueData.get("GOLD").iterator().next());
-        searchResults.add(leagueData.get("MASTER").iterator().next());
-        positioner.addQueryResults("FIRST OF EACH", searchResults);
+       
         
         
         positioner.positionQueryResults();
         
+        repaint();
     }
 
     public void deserializeData() {

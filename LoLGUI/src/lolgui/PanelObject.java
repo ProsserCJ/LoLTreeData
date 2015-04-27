@@ -36,16 +36,18 @@ public abstract class PanelObject {
         childrenVisible = !childrenVisible;
         for(PanelObject p : links)
         {
-            p.setSelfAndChildVisibility(childrenVisible);
+            p.visible = childrenVisible;
+            p.setChildVisibility(false);
             
         }
     }
     
-    private void setSelfAndChildVisibility(boolean b){
-        visible=childrenVisible= b;
+    private void setChildVisibility(boolean b){
+        childrenVisible= b;
         for(PanelObject p : links)
         {
-            p.setSelfAndChildVisibility(b);
+            p.visible = b;
+            p.setChildVisibility(b);
         }
     }
         
@@ -85,9 +87,9 @@ public abstract class PanelObject {
         return center;
     }
     
-    public void paint(Graphics g){
+    public void paintLinks(Graphics g){
         if(!this.visible)return;
-         if(selected)
+        if(selected)
             g.setColor(selectedColor);
         else
             g.setColor(lineColor);
@@ -97,6 +99,10 @@ public abstract class PanelObject {
             if(p.visible)
                 g.drawLine(center.x, center.y, p.center.x, p.center.y);
         }
+    }
+    
+    public void paint(Graphics g){
+        if(!this.visible)return;
         
         //get string width and height
         bounds = g.getFontMetrics().getStringBounds(info, g).getBounds();
@@ -133,7 +139,7 @@ public abstract class PanelObject {
     
     public void addRemoveLink(PanelObject o){
         if(links.contains(o)){
-            links.remove(0);
+            links.remove(o);
         }
         else{
             o.linksToMe++;
@@ -172,7 +178,8 @@ public abstract class PanelObject {
         center.y += dy;
         
         for(PanelObject p : links){
-            p.move(dx, dy);
+            //if(p.visible)
+                p.move(dx, dy);
         }
     }
     

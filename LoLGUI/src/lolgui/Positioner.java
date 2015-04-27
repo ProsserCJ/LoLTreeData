@@ -40,6 +40,8 @@ public class Positioner {
         bounds = new Rectangle(0,0,width,height);
     }
     
+    private QueryObject customQuery = null;
+    
     private ArrayList<QueryObject> queries = new ArrayList();
     
     private ArrayList<LeagueObject> leagueObjects = new ArrayList();
@@ -54,6 +56,33 @@ public class Positioner {
     
     public void setQueryResults(ArrayList<LeagueEntry> le){
         //TODO: fill out this method
+        if(customQuery == null)
+        {
+            QueryObject q = new QueryObject("CUSTOM");
+            queries.add(q);
+            customQuery=q;
+            q.setCenter(bounds.width/2,bounds.height/2);
+        }
+        else{
+            customQuery.getLinks().clear();
+        }
+        for(LeagueEntry newEntry : le){
+            boolean found = false;
+            for(LeagueEntryObject existingObj : lEntryObjects)
+            {
+                if(newEntry==existingObj.entryData)
+                {
+                    customQuery.addRemoveLink(existingObj);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found){
+                LeagueEntryObject newObj = new LeagueEntryObject(newEntry);
+                customQuery.addRemoveLink(newObj);
+                lEntryObjects.add(newObj);
+            }
+        }
         
     }
     
@@ -61,14 +90,23 @@ public class Positioner {
     
     public void paintAll(Graphics g)
     {
-        for(TeamObject t : teamObjects)
-            t.paint(g);
-        for(QueryObject q : queries)
-            q.paint(g);
+         for(LeagueEntryObject le : lEntryObjects)
+            le.paintLinks(g);
         for(LeagueObject l : leagueObjects)
-            l.paint(g);
+            l.paintLinks(g);
+        for(QueryObject q : queries)
+            q.paintLinks(g);
+        for(TeamObject t : teamObjects)
+            t.paintLinks(g);
+        
         for(LeagueEntryObject le : lEntryObjects)
             le.paint(g);
+        for(LeagueObject l : leagueObjects)
+            l.paint(g);
+        for(QueryObject q : queries)
+            q.paint(g);
+        for(TeamObject t : teamObjects)
+            t.paint(g);
         
     }
     
@@ -139,7 +177,7 @@ public class Positioner {
         double currentAngle = 0;
         int currentNumberOfLinks = 1;
         
-        double maxDistFromCenter = (min(bounds.width,bounds.height)/2.0)-50;
+        double maxDistFromCenter = (min(bounds.width,bounds.height)/2.0)-100;
         
         for(LeagueObject l : leagueObjects)
         {

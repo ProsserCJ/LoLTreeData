@@ -78,7 +78,7 @@ public class LoLGUI extends JFrame implements ActionListener{
     private void initComponents() {
         setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE);        
         setBounds(DEFAULTBASE.x,DEFAULTBASE.y, DEFAULTWIDTH, DEFAULTHEIGHT);
-        panel = new LoLPanel();
+        panel = new LoLPanel(DEFAULTWIDTH,DEFAULTHEIGHT);
         addTeamButton = new JButton("Create Team");
         getContentPane().add(addTeamButton, BorderLayout.WEST);
         searchButton.addActionListener(this);
@@ -137,7 +137,8 @@ public class LoLGUI extends JFrame implements ActionListener{
                 dialog.show();
             }
          }); 
-    }
+         
+   }
     @Override
     public void actionPerformed(ActionEvent ae) {
         try{
@@ -147,6 +148,7 @@ public class LoLGUI extends JFrame implements ActionListener{
             panel.getResults(tierField.getText(), leagueField.getText(), championField.getText()
                 , rookieBox.isSelected(), hotStreakBox.isSelected(), veteranBox.isSelected()
                 , matchesNum);
+            repaint();
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(this, "Req. Matches must be an Integer from 0 to 6 (the number of matches required for selection)");
