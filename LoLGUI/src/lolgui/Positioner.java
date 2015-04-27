@@ -6,6 +6,7 @@
 package lolgui;
 
 import dto.League.League;
+import dto.League.LeagueEntry;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -42,6 +43,10 @@ public class Positioner {
     
     private ArrayList<LeagueObject> leagueObjects = new ArrayList();
     
+    private ArrayList<TeamObject> teamObjects = new ArrayList();
+    
+    private ArrayList<LeagueEntryObject> lEntryObjects = new ArrayList();
+    
     public void setQueries(ArrayList<QueryObject> q){queries=q;}
     
     public void setResults(ArrayList<LeagueObject> l){leagueObjects=l;}
@@ -50,10 +55,21 @@ public class Positioner {
     
     public void paintAll(Graphics g)
     {
+        for(TeamObject t : teamObjects)
+            t.paint(g);
         for(QueryObject q : queries)
             q.paint(g);
         for(LeagueObject l : leagueObjects)
             l.paint(g);
+        for(LeagueEntryObject le : lEntryObjects)
+            le.paint(g);
+        
+    }
+    
+    public void addTeam(Team t){
+        TeamObject teamObj = new TeamObject(t);
+        teamObj.setCenter(this.bounds.width/2,this.bounds.height/10);
+        this.teamObjects.add(teamObj);                
     }
     
     public void addQueryResults(String queryString, List<League> leagueList)
@@ -68,7 +84,7 @@ public class Positioner {
                 if(lObj.leagueData == l)
                 {
                     foundObj = true;
-                    q.addLink(lObj);
+                    q.addRemoveLink(lObj);
                     break;
                 }
             }
@@ -76,14 +92,13 @@ public class Positioner {
             {
                 LeagueObject lObj = new LeagueObject(l);
                 leagueObjects.add(lObj);
-                q.addLink(lObj);
+                q.addRemoveLink(lObj);
+                addLeagueEntries(lObj);
             }
         }
         
         queries.add(q);
     }
-    
-    
     
     public void positionQueryResults()
     {
@@ -136,6 +151,20 @@ public class Positioner {
                 currentNumberOfLinks = l.getIncomingLinks();
                 //currentAngle=0;
             }
+            
+            double childAngle = 0;
+            double childAngleStep = 2*3.141592 / l.leagueData.getEntries().size();
+            double childLineLength = 100;
+            for(PanelObject entryObj : l.getLinks()){
+                entryObj.visible=false;
+                int dX = (int)(childLineLength * cos(childAngle));
+                int dY = (int)(childLineLength * sin(childAngle));
+                Point disp = new Point(dX,dY);
+                entryObj.setCenter(add(l.getCenter(),disp));
+                childAngle += childAngleStep;
+            }
+            
+            
         }
         
         currentAngle = 3.14159265*.25;
@@ -153,34 +182,124 @@ public class Positioner {
         }
         
         
+        
+    }
+    
+    public void handleDoubleClick(Point p){
+        for(TeamObject t : teamObjects)
+            if(t.checkClick(p)) t.toggleChildrenVisibility();
+        for(QueryObject q : queries)
+            if(q.checkClick(p)) q.toggleChildrenVisibility();
+        for(LeagueObject l : leagueObjects)
+            if(l.checkClick(p)) l.toggleChildrenVisibility();
+        for(LeagueEntryObject le : lEntryObjects)
+            if(le.checkClick(p)) le.toggleChildrenVisibility();
+    }
+    
+    //assumes a player only belongs to one league
+    private void addLeagueEntries(LeagueObject l){
+        for(LeagueEntry le : l.leagueData.getEntries()){
+            LeagueEntryObject entryObj = new LeagueEntryObject(le);
+            l.addRemoveLink(entryObj);
+            this.lEntryObjects.add(entryObj);
+        }
     }
     
     
-    void checkClick(Point p)
+    
+    void checkClick(Point p, boolean altClick)
     {
-        this.clickedItem = null;
-        for(QueryObject q :queries)
+        //adding link
+        if(altClick && this.clickedItem!=null)
         {
-            q.refresh();
-        }
-        for(QueryObject q :queries)
-        {
-            if(q.checkClick(p)){
-                q.select();
-                this.clickedItem=q;
+            PanelObject newlyClicked = null;
+            for(TeamObject t :teamObjects)
+            {
+                if(t.checkClick(p))newlyClicked = t;
+            }
+            for(LeagueEntryObject le :lEntryObjects)
+            {
+                if(le.checkClick(p))newlyClicked = le;
+            }
+            
+            if(newlyClicked instanceof LeagueEntryObject && clickedItem instanceof TeamObject)
+            {
+                clickedItem.addRemoveLink(newlyClicked);
+            }
+            if(newlyClicked instanceof TeamObject && clickedItem instanceof LeagueEntryObject)
+            {
+                newlyClicked.addRemoveLink(clickedItem);
             }
         }
-        for(LeagueObject l : leagueObjects)
+        else
         {
-            if(l.checkClick(p)){                
-                l.select();
-                this.clickedItem=l;
+            this.clickedItem = null;
+            for(QueryObject q :queries)
+            {
+                q.refresh();
+            }
+            for(TeamObject t :teamObjects)
+            {
+                t.refresh();
+            }
+            for(QueryObject q :queries)
+            {
+                if(q.checkClick(p)){
+                    q.select();
+                    this.clickedItem=q;
+                    return;
+                }
+            }
+            for(LeagueObject l : leagueObjects)
+            {
+                if(l.checkClick(p)){                
+                    l.select();
+                    this.clickedItem=l;
+                    return;
+                }
+            }
+            for(TeamObject t : teamObjects)
+            {
+                if(t.checkClick(p)){                
+                    t.select();
+                    this.clickedItem=t;
+                    return;
+                }
+            }
+            for(LeagueEntryObject le :lEntryObjects)
+            {
+                if(le.checkClick(p)){                
+                    le.select();
+                    this.clickedItem=le;
+                    return;
+                }
             }
         }
     }
     
     public void moveSelected(int x, int y){
+        
         if(clickedItem!=null)
-            this.clickedItem.setCenter(x,y);
+            //also moves children
+            this.clickedItem.move(x,y);
+        else{
+            Point offset = new Point(x,y);
+            for(TeamObject t : teamObjects)
+                t.setCenter(add(t.getCenter(),offset));
+            for(QueryObject q : queries)
+                q.setCenter(add(q.getCenter(),offset));
+            for(LeagueObject l : leagueObjects)
+                l.setCenter(add(l.getCenter(),offset));
+            for(LeagueEntryObject le : lEntryObjects)
+                le.setCenter(add(le.getCenter(),offset));
+        }
     }
+    
+    
+    private Point add(Point p1, Point p2)
+    {
+        return new Point(p1.x+p2.x,p1.y+p2.y);
+    }
+    
+    
 }

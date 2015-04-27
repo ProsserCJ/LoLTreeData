@@ -40,7 +40,7 @@ class Team implements Serializable {
 
 public class LoLGUI extends JFrame{
     Point DEFAULTBASE = new Point(50,50);
-    final int DEFAULTWIDTH = 500, DEFAULTHEIGHT = 500, MAXVERTICES = 50, MINVERTICES = 3;
+    final int DEFAULTWIDTH = 700, DEFAULTHEIGHT = 700, MAXVERTICES = 50, MINVERTICES = 3;
 
     LoLPanel panel;
     JButton addTeamButton;
@@ -83,7 +83,7 @@ public class LoLGUI extends JFrame{
                 {
                   @Override
                   public void windowClosed(WindowEvent e) {
-                    if (!newTeam.getName().equals("")) panel.teamData.add(newTeam);
+                    if (!newTeam.getName().equals("")) panel.addTeam(newTeam);
                   }
                 });      
                 dialog.show();
