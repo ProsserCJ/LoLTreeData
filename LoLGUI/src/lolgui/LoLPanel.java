@@ -165,7 +165,7 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
     }
     
     public void getResults(String tierStr, String leagueStr, String championStr, boolean rookie, boolean hotStreak, boolean veteran, int matches){
-        TreeSet<LeagueEntry> s = new TreeSet();
+        ArrayList<LeagueEntry> s = new ArrayList();
         
         for (String tier : leagueData.keySet()) {
             for (League league : leagueData.get(tier)) {
@@ -188,7 +188,7 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
                 }
             }
         } 
-        positioner.setResults(s);
+        positioner.setQueryResults(s);
         //return s;
     }
     

@@ -52,7 +52,7 @@ public class Positioner {
     
     public void setResults(ArrayList<LeagueObject> l){leagueObjects=l;}
     
-    public void setResults(TreeSet<LeagueEntry> le){
+    public void setQueryResults(ArrayList<LeagueEntry> le){
         //TODO: fill out this method
         
     }

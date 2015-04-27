@@ -23,6 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -70,7 +71,7 @@ public class LoLGUI extends JFrame implements ActionListener{
     JCheckBox veteranBox = new JCheckBox();
     
     JLabel matchesLabel = new JLabel("Req. Matches: ", SwingConstants.RIGHT);
-    JTextField matchesField = new JTextField("",10);
+    JTextField matchesField = new JTextField("6",10);
     public LoLGUI() {
         initComponents();
     }
@@ -139,9 +140,17 @@ public class LoLGUI extends JFrame implements ActionListener{
     }
     @Override
     public void actionPerformed(ActionEvent ae) {
-        panel.getResults(tierField.getText(), leagueField.getText(), championField.getText()
+        try{
+            int matchesNum = Integer.parseInt(matchesField.getText());
+            if(matchesNum < 0 || matchesNum > 6)
+                throw new Exception();
+            panel.getResults(tierField.getText(), leagueField.getText(), championField.getText()
                 , rookieBox.isSelected(), hotStreakBox.isSelected(), veteranBox.isSelected()
-                , Integer.parseInt(matchesField.getText()));
+                , matchesNum);
+        }
+        catch(Exception e){
+            JOptionPane.showMessageDialog(this, "Req. Matches must be an Integer from 0 to 6 (the number of matches required for selection)");
+        }
     }
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
