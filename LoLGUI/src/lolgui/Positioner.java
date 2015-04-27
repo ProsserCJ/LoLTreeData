@@ -6,6 +6,7 @@
 package lolgui;
 
 import dto.League.League;
+import dto.League.LeagueEntry;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 /**
  *
  * @author Nalta
@@ -45,6 +47,11 @@ public class Positioner {
     public void setQueries(ArrayList<QueryObject> q){queries=q;}
     
     public void setResults(ArrayList<LeagueObject> l){leagueObjects=l;}
+    
+    public void setResults(TreeSet<LeagueEntry> le){
+        //TODO: fill out this method
+        
+    }
     
     public void paintAll(Graphics g)
     {

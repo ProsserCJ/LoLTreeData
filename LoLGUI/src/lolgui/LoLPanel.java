@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.JPanel;
 import dto.League.League;
+import dto.League.LeagueEntry;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -22,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -145,6 +147,34 @@ public class LoLPanel extends JPanel {
          } catch(Exception e) {
              System.err.println(e.getMessage());
          }
+    }
+    
+    public void getResults(String tierStr, String leagueStr, String championStr, boolean rookie, boolean hotStreak, boolean veteran, int matches){
+        TreeSet<LeagueEntry> s = new TreeSet();
+        
+        for (String tier : leagueData.keySet()) {
+            for (League league : leagueData.get(tier)) {
+                for (LeagueEntry entry : league.getEntries()) {
+                    int fits = 0;
+                    if(tier.equalsIgnoreCase(tierStr))
+                        ++fits;
+                    if(league.getName().equalsIgnoreCase(leagueStr))
+                        ++fits;
+                    if(championData.get(entry.getPlayerOrTeamId()).equalsIgnoreCase(championStr))
+                        ++fits;
+                    if(rookie == entry.isFreshBlood())
+                        ++fits;
+                    if(hotStreak == entry.isHotStreak())
+                        ++fits;
+                    if(veteran == entry.isVeteran())
+                        ++fits;
+                    if(fits >= matches)
+                        s.add(entry);
+                }
+            }
+        } 
+        positioner.setResults(s);
+        //return s;
     }
     
     public void paint(Graphics g) {
