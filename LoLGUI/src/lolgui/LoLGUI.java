@@ -15,6 +15,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +48,12 @@ class Team implements Serializable {
     void addPlayer(LeagueEntry l) { players.add(l); }
 }
 
-
-public class LoLGUI extends JFrame implements ActionListener{
+public class LoLGUI extends JFrame implements ActionListener, Serializable{
     Point DEFAULTBASE = new Point(50,50);
     final int DEFAULTWIDTH = 1000, DEFAULTHEIGHT = 700, MAXVERTICES = 50, MINVERTICES = 3;
 
     LoLPanel panel;
-    JButton addTeamButton;
+    
     
     GridLayout grid = new GridLayout(2,8);
     JPanel top = new JPanel(grid);
@@ -72,15 +75,34 @@ public class LoLGUI extends JFrame implements ActionListener{
     
     JLabel matchesLabel = new JLabel("Req. Matches: ", SwingConstants.RIGHT);
     JTextField matchesField = new JTextField("6",10);
+    
+    JPanel left = new JPanel(new GridLayout(3,1));
+    JButton addTeamButton = new JButton("Create Team");
+    JButton saveButton = new JButton("Save");
+    JButton loadButton = new JButton("Load");
+    
     public LoLGUI() {
         initComponents();
     }
     private void initComponents() {
         setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE);        
         setBounds(DEFAULTBASE.x,DEFAULTBASE.y, DEFAULTWIDTH, DEFAULTHEIGHT);
+        
+      /*  try { 
+            panel = deserializePanel();
+            repaint();
+        }
+        catch(Exception e) { 
+           panel = new LoLPanel(DEFAULTWIDTH,DEFAULTHEIGHT);
+           System.out.print(e.getMessage());
+        } */
+        
         panel = new LoLPanel(DEFAULTWIDTH,DEFAULTHEIGHT);
-        addTeamButton = new JButton("Create Team");
-        getContentPane().add(addTeamButton, BorderLayout.WEST);
+        left.add(addTeamButton, grid);
+        left.add(saveButton, grid);
+        left.add(loadButton, grid);
+        getContentPane().add(left, BorderLayout.WEST);
+        
         searchButton.addActionListener(this);
         
         top.add(tierLabel, grid);
@@ -112,12 +134,6 @@ public class LoLGUI extends JFrame implements ActionListener{
             }
         });
         
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                panel.serializeData();
-            }
-        });
-        
          addTeamButton.addActionListener(new ActionListener() 
          {
             @Override
@@ -138,6 +154,30 @@ public class LoLGUI extends JFrame implements ActionListener{
             }
          }); 
          
+         saveButton.addActionListener(new ActionListener(){
+            @Override
+             public void actionPerformed(ActionEvent ae) {
+               // panel.lastMouseClick = null;
+                serializePanel();
+            }
+         });
+         
+         loadButton.addActionListener(new ActionListener(){
+            @Override
+             public void actionPerformed(ActionEvent ae) {
+                try { 
+                    LoLPanel temp = panel;
+                    panel = deserializePanel();
+                    getContentPane().remove(temp);
+                    getContentPane().add(panel);
+                    repaint();
+                }
+                catch(Exception e) { 
+                   System.out.print(e.getMessage());
+                }
+             }
+         });
+         
    }
     @Override
     public void actionPerformed(ActionEvent ae) {
@@ -154,6 +194,33 @@ public class LoLGUI extends JFrame implements ActionListener{
             JOptionPane.showMessageDialog(this, "Req. Matches must be an Integer from 0 to 6 (the number of matches required for selection)");
         }
     }
+    
+    private LoLPanel deserializePanel() throws Exception {
+         FileInputStream fileIn = new FileInputStream("panel.ser");
+         ObjectInputStream in = new ObjectInputStream(fileIn);
+         panel = (LoLPanel)in.readObject();
+         in.close();
+         fileIn.close();
+         System.out.println("Serialized panel loaded from panel.ser");
+         return panel;
+    }
+    
+    private void serializePanel() {
+        try {
+         panel.positioner.refresh();
+         FileOutputStream fileOut = new FileOutputStream("panel.ser");
+         ObjectOutputStream out = new ObjectOutputStream(fileOut);
+         out.writeObject(panel);
+         out.flush();
+         out.close();
+         fileOut.close();
+         System.out.println("Panel serialized to panel.ser");
+        }
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+    
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

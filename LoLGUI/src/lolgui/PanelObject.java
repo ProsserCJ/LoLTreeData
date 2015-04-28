@@ -9,16 +9,15 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
-
 
 
 /**
  *
  * @author Nalta
  */
-public abstract class PanelObject {
+public abstract class PanelObject implements Serializable {
    
     private final int MAX_STR_LENGTH = 100;
     
@@ -73,6 +72,8 @@ public abstract class PanelObject {
         bounds.width = info.length()*defaultFontSize;
         bounds.height = defaultFontSize;
     }
+    
+    public PanelObject(){info = "";}
     
     public void setCenter(int x, int y){
         center.x = x;

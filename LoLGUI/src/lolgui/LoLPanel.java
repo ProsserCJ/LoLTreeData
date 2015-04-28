@@ -18,14 +18,11 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 /**
@@ -33,7 +30,7 @@ import javax.swing.SwingUtilities;
  * @author PROSSERCJ1
  */
 
-public class LoLPanel extends JPanel implements MouseMotionListener{
+public class LoLPanel extends JPanel implements MouseMotionListener, Serializable{
     Map<String, Set<League>> leagueData;
     Map<String, String> championData;
     private List<Team> teamData;
@@ -41,8 +38,6 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
     Point lastMouseClick;
     
     Positioner positioner;
-    
-    int numClickes = 0;
     
     public LoLPanel(int w, int h) {
         super();
@@ -212,7 +207,11 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
     }
 
     public void mouseDragged(MouseEvent e) {
-        positioner.moveSelected(e.getX()-lastMouseClick.x,e.getY()-lastMouseClick.y, e.isControlDown());
+        try {positioner.moveSelected(e.getX()-lastMouseClick.x,e.getY()-lastMouseClick.y, e.isControlDown()); }
+        catch(Exception ex)
+        {
+            System.out.print(ex.getMessage());
+        }
         repaint();
         lastMouseClick = e.getPoint();
     }

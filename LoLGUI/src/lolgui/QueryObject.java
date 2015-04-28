@@ -6,12 +6,15 @@
 package lolgui;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author Nalta
  */
-public class QueryObject extends PanelObject {
+public class QueryObject extends PanelObject implements Serializable {
+   
+    public QueryObject() {super("");}
     QueryObject(String s){
         super(s);
         super.fillColor = new Color(255,150,255);

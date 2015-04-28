@@ -7,17 +7,21 @@ package lolgui;
 
 import dto.League.League;
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author Nalta
  */
-public class LeagueObject extends PanelObject{
+public class LeagueObject extends PanelObject implements Serializable{
     
     public League leagueData;
     
-    
-    
+    LeagueObject(){
+        super("");
+        leagueData = new League();
+    }
+            
     LeagueObject(League data)
     {
         super(data.getName());

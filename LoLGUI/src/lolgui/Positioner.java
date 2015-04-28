@@ -10,24 +10,20 @@ import dto.League.LeagueEntry;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import static java.lang.Integer.max;
 import static java.lang.Integer.min;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 /**
  *
  * @author Nalta
  */
-public class Positioner {
+public class Positioner implements Serializable {
     
     private Rectangle bounds;
     
@@ -82,11 +78,10 @@ public class Positioner {
                 customQuery.addRemoveLink(newObj);
                 lEntryObjects.add(newObj);
             }
-        }
-        
+        } 
     }
     
-    private PanelObject clickedItem = null;
+    public PanelObject clickedItem = null;
     
     public void paintAll(Graphics g)
     {
@@ -223,10 +218,19 @@ public class Positioner {
             q.setCenter(pointX+centerX, pointY+centerY);
             
             currentAngle+=3.14159265*2/queries.size();
+        }   
+    }
+    
+    public void refresh() {
+        this.clickedItem = null;
+        for(QueryObject q :queries)
+        {
+            q.refresh();
         }
-        
-        
-        
+        for(TeamObject t :teamObjects)
+        {
+            t.refresh();
+        }
     }
     
     public void handleDoubleClick(Point p){
@@ -359,8 +363,7 @@ public class Positioner {
                 le.setCenter(add(le.getCenter(),offset));
         }
     }
-    
-    
+
     private Point add(Point p1, Point p2)
     {
         return new Point(p1.x+p2.x,p1.y+p2.y);

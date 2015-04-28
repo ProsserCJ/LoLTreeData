@@ -2,6 +2,7 @@
 package lolgui;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -13,7 +14,7 @@ import java.awt.Color;
  *
  * @author Nalta
  */
-public class TeamObject extends PanelObject{
+public class TeamObject extends PanelObject implements Serializable{
     public Team teamData;
     public TeamObject(Team t){
         super(t.getName());
