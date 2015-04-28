@@ -20,7 +20,7 @@ import java.util.List;
  */
 public abstract class PanelObject {
    
-    private final int MAX_STR_LENGTH = 15;
+    private final int MAX_STR_LENGTH = 100;
     
     private ArrayList<PanelObject> links = new ArrayList();
     

@@ -71,11 +71,18 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
             }
             @Override
             public void mouseClicked(MouseEvent e){
-                if(e.getClickCount()>=2){
-                    positioner.handleDoubleClick(e.getPoint());
-                    repaint();
-                }
                 
+                if(SwingUtilities.isRightMouseButton(e))
+                {
+                    positioner.makeLinksOrbit();
+                }
+                else
+                {
+                    if(e.getClickCount()>=2){
+                        positioner.handleDoubleClick(e.getPoint());
+                    }
+                }
+                repaint();
             }
         });
         addMouseMotionListener(this);
@@ -93,11 +100,6 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
 
             positioner.addQueryResults(tier, searchResults);
         }
-        
-        
-        
-       
-        
         
         positioner.positionQueryResults();
         
@@ -203,7 +205,6 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
     public void setSize(int width, int height)
     {
         positioner.setSize(width,height);
-        positioner.positionQueryResults();
     }
     
      public void mouseMoved(MouseEvent e) {
@@ -211,7 +212,7 @@ public class LoLPanel extends JPanel implements MouseMotionListener{
     }
 
     public void mouseDragged(MouseEvent e) {
-        positioner.moveSelected(e.getX()-lastMouseClick.x,e.getY()-lastMouseClick.y);
+        positioner.moveSelected(e.getX()-lastMouseClick.x,e.getY()-lastMouseClick.y, e.isControlDown());
         repaint();
         lastMouseClick = e.getPoint();
     }

@@ -250,6 +250,25 @@ public class Positioner {
     }
     
     
+    public void makeLinksOrbit()
+    {
+        double childAngle = 0;
+        double childAngleStep = 2*3.141592 / clickedItem.getLinks().size();
+        double childLineLength = 150;
+        for(PanelObject entryObj : clickedItem.getLinks()){
+            int dX = (int)(childLineLength * cos(childAngle));
+            int dY = (int)(childLineLength * sin(childAngle));
+            Point disp = new Point(dX,dY);
+            Point newLoc = add(clickedItem.getCenter(),disp);
+            Point moveAmt = new Point();
+            moveAmt.x = newLoc.x - entryObj.getCenter().x;
+            moveAmt.y = newLoc.y - entryObj.getCenter().y;
+            
+            entryObj.move(moveAmt.x,moveAmt.y);
+            childAngle += childAngleStep;
+        }
+    }
+    
     
     void checkClick(Point p, boolean altClick)
     {
@@ -321,13 +340,15 @@ public class Positioner {
         }
     }
     
-    public void moveSelected(int x, int y){
-        
+    public void moveSelected(int x, int y, boolean withOutChildren){
+        Point offset = new Point(x,y);
         if(clickedItem!=null)
             //also moves children
-            this.clickedItem.move(x,y);
+            if(withOutChildren)
+                this.clickedItem.setCenter(add(clickedItem.getCenter(),offset));
+            else
+                this.clickedItem.move(x,y);
         else{
-            Point offset = new Point(x,y);
             for(TeamObject t : teamObjects)
                 t.setCenter(add(t.getCenter(),offset));
             for(QueryObject q : queries)
