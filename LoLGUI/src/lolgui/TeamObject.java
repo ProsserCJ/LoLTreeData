@@ -14,7 +14,7 @@ import java.io.Serializable;
  *
  * @author Nalta
  */
-public class TeamObject extends PanelObject implements Serializable{
+public class TeamObject extends PanelObject {
     public Team teamData;
     public TeamObject(Team t){
         super(t.getName());

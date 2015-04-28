@@ -88,15 +88,6 @@ public class LoLGUI extends JFrame implements ActionListener, Serializable{
         setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE);        
         setBounds(DEFAULTBASE.x,DEFAULTBASE.y, DEFAULTWIDTH, DEFAULTHEIGHT);
         
-      /*  try { 
-            panel = deserializePanel();
-            repaint();
-        }
-        catch(Exception e) { 
-           panel = new LoLPanel(DEFAULTWIDTH,DEFAULTHEIGHT);
-           System.out.print(e.getMessage());
-        } */
-        
         panel = new LoLPanel(DEFAULTWIDTH,DEFAULTHEIGHT);
         left.add(addTeamButton, grid);
         left.add(saveButton, grid);
@@ -158,6 +149,7 @@ public class LoLGUI extends JFrame implements ActionListener, Serializable{
             @Override
              public void actionPerformed(ActionEvent ae) {
                // panel.lastMouseClick = null;
+                panel.positioner.refresh();
                 serializePanel();
             }
          });

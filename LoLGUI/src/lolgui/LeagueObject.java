@@ -13,14 +13,9 @@ import java.io.Serializable;
  *
  * @author Nalta
  */
-public class LeagueObject extends PanelObject implements Serializable{
+public class LeagueObject extends PanelObject{
     
     public League leagueData;
-    
-    LeagueObject(){
-        super("");
-        leagueData = new League();
-    }
             
     LeagueObject(League data)
     {

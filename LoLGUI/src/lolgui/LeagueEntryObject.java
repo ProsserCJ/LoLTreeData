@@ -13,14 +13,10 @@ import java.io.Serializable;
  *
  * @author Nalta
  */
-public class LeagueEntryObject extends PanelObject implements Serializable {
+public class LeagueEntryObject extends PanelObject{
     
     public LeagueEntry entryData;
     
-    public LeagueEntryObject() {
-        super("");
-        entryData = new LeagueEntry();
-    }
     public LeagueEntryObject(LeagueEntry le){
         super(le.getPlayerOrTeamName());
         super.fillColor = new Color(150,255,150);
