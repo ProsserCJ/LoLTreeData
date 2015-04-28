@@ -162,6 +162,7 @@ public class LoLGUI extends JFrame implements ActionListener, Serializable{
                     panel = deserializePanel();
                     getContentPane().remove(temp);
                     getContentPane().add(panel);
+                    panel.mouseSetUp();
                     repaint();
                 }
                 catch(Exception e) { 

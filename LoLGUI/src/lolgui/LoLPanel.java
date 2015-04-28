@@ -56,7 +56,29 @@ public class LoLPanel extends JPanel implements MouseMotionListener, Serializabl
 //            }
 //        } 
         
-         addMouseListener(new MouseAdapter(){
+         mouseSetUp();
+        
+        
+        for(String tier : leagueData.keySet())
+        {
+        
+            //seting test data
+            ArrayList<League> searchResults = new ArrayList();
+            for(League l : leagueData.get(tier))
+            {
+                searchResults.add(l);
+            }
+
+            positioner.addQueryResults(tier, searchResults);
+        }
+        
+        positioner.positionQueryResults();
+        
+        repaint();
+    }
+    
+    public void mouseSetUp() {
+        addMouseListener(new MouseAdapter(){
             @Override
             public void mousePressed(MouseEvent e)
             {
@@ -81,24 +103,6 @@ public class LoLPanel extends JPanel implements MouseMotionListener, Serializabl
             }
         });
         addMouseMotionListener(this);
-        
-        
-        for(String tier : leagueData.keySet())
-        {
-        
-            //seting test data
-            ArrayList<League> searchResults = new ArrayList();
-            for(League l : leagueData.get(tier))
-            {
-                searchResults.add(l);
-            }
-
-            positioner.addQueryResults(tier, searchResults);
-        }
-        
-        positioner.positionQueryResults();
-        
-        repaint();
     }
 
     public void deserializeData() {
